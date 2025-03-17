@@ -18,6 +18,9 @@ namespace VolunteerRegistration
             builder.Services.AddDbContext<VolunteerRegistrationContext>(options =>
                 options.UseSqlServer(connectionString));
 
+
+           
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
@@ -41,6 +44,14 @@ namespace VolunteerRegistration
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+            // Uruchomienie seedowania danych
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<VolunteerRegistrationContext>();
+                SeedData.GenerateVolunteers(dbContext); // Wywo³anie generatora danych
+            }
 
             app.Run();
         }

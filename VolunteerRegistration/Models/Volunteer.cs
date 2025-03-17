@@ -12,3 +12,5 @@
         public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
     }
 }
+
+

@@ -8,10 +8,9 @@
         public DateTime EventDate { get; set; }
         public string Location { get; set; }
 
-        //public int OrganizerId { get; set; }
-        //public Organizer Organizer { get; set; }
-
         public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
         public ICollection<EventOrganizer> EventOrganizers { get; set; } = new List<EventOrganizer>();
     }
 }
+
+

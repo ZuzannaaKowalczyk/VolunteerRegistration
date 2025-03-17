@@ -1,3 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using VolunteerRegistration.Models;
+
 namespace VolunteerRegistration
 {
     public class Program
@@ -5,6 +10,13 @@ namespace VolunteerRegistration
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Pobranie Connection String z appsettings.json
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            // Dodanie DbContext do Dependency Injection
+            builder.Services.AddDbContext<VolunteerRegistrationContext>(options =>
+                options.UseSqlServer(connectionString));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

@@ -1,0 +1,55 @@
+﻿@model List<VolunteerRegistration.Models.Registration>
+@{
+    ViewData["Title"] = "Wyszukaj swoje rejestracje";
+    string searchedEmail = ViewBag.SearchedEmail as string;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post" asp-action="Search">
+    <div class="form-group">
+        <label for="email">Podaj swój email:</label>
+        <input type="email" name="email" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Szukaj</button>
+</form>
+
+@if (!string.IsNullOrEmpty(searchedEmail))
+{
+    <h4 class="mt-4">Rejestracje dla: <strong>@searchedEmail</strong></h4>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table mt-2">
+            <thead>
+                <tr>
+                    <th>Data rejestracji</th>
+                    <th>Wydarzenie</th>
+                    <th>Data wydarzenia</th>
+                    <th>Lokalizacja</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reg in Model)
+                {
+                    <tr>
+                        <td>@reg.RegistrationDate.ToString("dd.MM.yyyy")</td>
+                        <td>@reg.Event.EventName</td>
+                        <td>@reg.Event.EventDate.ToString("dd.MM.yyyy")</td>
+                        <td>@reg.Event.Location</td>
+                        <td>
+                            <form asp-action="Delete" asp-route-id="@reg.Id" method="post" onsubmit="return confirm('Czy na pewno chcesz się wyrejestrować?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Rezygnuj</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted mt-3">Brak rejestracji dla podanego adresu email.</p>
+    }
+}

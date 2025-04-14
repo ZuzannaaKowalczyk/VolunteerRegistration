@@ -1,0 +1,39 @@
+﻿@model IEnumerable<VolunteerRegistration.Models.Registration>
+
+@{
+    ViewData["Title"] = "Zapisani wolontariusze";
+    var eventName = ViewBag.EventName as string;
+}
+
+<h2>Zapisani wolontariusze na wydarzenie: <strong>@eventName</strong></h2>
+
+@if (!Model.Any())
+{
+    <p>Brak zapisanych wolontariuszy na to wydarzenie.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Email</th>
+                <th>Telefon</th>
+                <th>Data rejestracji</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reg in Model)
+            {
+                <tr>
+                    <td>@reg.Volunteer.Firstname</td>
+                    <td>@reg.Volunteer.Lastname</td>
+                    <td>@reg.Volunteer.Email</td>
+                    <td>@reg.Volunteer.PhoneNumber</td>
+                    <td>@reg.RegistrationDate.ToString("dd.MM.yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

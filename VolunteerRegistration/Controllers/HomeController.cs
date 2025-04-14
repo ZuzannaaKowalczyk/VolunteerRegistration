@@ -1,31 +1,42 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VolunteerRegistration.Models;
+using VolunteerRegistration.Repositories;
 
-namespace VolunteerRegistration.Controllers;
-
-public class HomeController : Controller
+namespace VolunteerRegistration.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController : Controller
     {
-        _logger = logger;
-    }
+        private readonly IRepository<Event> _eventRepository;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public HomeController(IRepository<Event> eventRepository)
+        {
+            _eventRepository = eventRepository;
+        }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+        public IActionResult Index(string city)
+        {
+            var query = _eventRepository
+                .GetAll()
+                .Include(e => e.EventOrganizers)
+                    .ThenInclude(eo => eo.Organizer)
+                .AsQueryable(); // 👈 to gwarantuje, że możemy używać .Where()
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (!string.IsNullOrEmpty(city))
+            {
+                query = query.Where(e => e.Location.Contains(city));
+            }
+
+            ViewData["CurrentCity"] = city;
+
+            var events = query.ToList();
+            return View(events);
+        }
+
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
     }
 }

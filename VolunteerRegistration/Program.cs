@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VolunteerRegistration.Models;
+using VolunteerRegistration.Repositories;
 
 namespace VolunteerRegistration
 {
@@ -23,6 +24,10 @@ namespace VolunteerRegistration
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IRepository<Volunteer>, VolunteerRepository>();
+            builder.Services.AddScoped<IRepository<Event>, EventRepository>();
+            builder.Services.AddScoped<IRepository<Organizer>, OrganizerRepository>();
+            builder.Services.AddScoped<IRepository<Registration>, RegistrationRepository>();
 
             var app = builder.Build();
 
@@ -47,11 +52,11 @@ namespace VolunteerRegistration
 
 
             // Uruchomienie seedowania danych
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<VolunteerRegistrationContext>();
-                SeedData.GenerateVolunteers(dbContext); // Wywo³anie generatora danych
-            }
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var dbContext = scope.ServiceProvider.GetRequiredService<VolunteerRegistrationContext>();
+            //    SeedData.GenerateVolunteers(dbContext); // Wywo³anie generatora danych
+            //}
 
             app.Run();
         }

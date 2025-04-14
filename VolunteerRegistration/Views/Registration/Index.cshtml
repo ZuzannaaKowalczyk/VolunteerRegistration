@@ -1,0 +1,36 @@
+﻿@model IEnumerable<VolunteerRegistration.Models.Registration>
+
+@{
+    ViewData["Title"] = "Lista rejestracji";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Dodaj rejestrację</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Wolontariusz ID</th>
+            <th>Wydarzenie ID</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.RegistrationDate.ToString("dd.MM.yyyy")</td>
+                <td>@r.VolunteerId</td>
+                <td>@r.EventId</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@r.Id">Edytuj</a> |
+                    <a asp-action="Delete" asp-route-id="@r.Id">Usuń</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

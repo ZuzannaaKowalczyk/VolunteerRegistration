@@ -1,0 +1,28 @@
+﻿@model VolunteerRegistration.Models.Volunteer
+
+<div class="row">
+    <div class="col-md-4">
+        <form action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-control">
+                <div class="form-group">
+                    <label asp-for="@Model.Firstname" class="control-label"></label>
+                    <input asp-for="@Model.Firstname" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="@Model.Lastname" class="control-label"></label>
+                    <input asp-for="@Model.Lastname" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="@Model.Email" class="control-label"></label>
+                    <input asp-for="@Model.Email" class="form-control" />
+                </div>
+              
+                <button style="margin-top:5px;" type="submit" value="Wyślij" class="btn btn-primary">Wyślij</button>
+                
+
+            </div>
+        </form>
+    </div>
+</div>

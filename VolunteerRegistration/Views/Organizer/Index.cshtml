@@ -1,0 +1,36 @@
+﻿@model IEnumerable<VolunteerRegistration.Models.Organizer>
+
+@{
+    ViewData["Title"] = "Lista organizatorów";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Dodaj organizatora</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Imię i nazwisko</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in Model)
+        {
+            <tr>
+                <td>@o.Name</td>
+                <td>@o.Email</td>
+                <td>@o.Phone</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@o.Id">Edytuj</a> |
+                    <a asp-action="Delete" asp-route-id="@o.Id">Usuń</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

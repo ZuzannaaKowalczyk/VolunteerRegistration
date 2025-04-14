@@ -1,0 +1,40 @@
+﻿@model IEnumerable<VolunteerRegistration.Models.Volunteer>
+
+@{
+    ViewData["Title"] = "Lista wolontariuszy";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p style="text-align: right;">
+    <a asp-action="Create" class="btn btn-primary">Dodaj wolontariusza</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Imię</th>
+            <th>Nazwisko</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th>Data urodzenia</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var v in Model)
+        {
+            <tr>
+                <td>@v.Firstname</td>
+                <td>@v.Lastname</td>
+                <td>@v.Email</td>
+                <td>@v.PhoneNumber</td>
+                <td>@v.BirthDate.ToString("dd.MM.yyyy")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@v.Id">Edytuj</a> |
+                    <a asp-action="Delete" asp-route-id="@v.Id">Usuń</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

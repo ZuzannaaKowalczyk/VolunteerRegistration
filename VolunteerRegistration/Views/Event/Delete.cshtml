@@ -1,0 +1,22 @@
+﻿@model VolunteerRegistration.Models.Event
+
+@{
+    ViewData["Title"] = "Usuń wydarzenie";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<h4>Czy na pewno chcesz usunąć to wydarzenie?</h4>
+
+<div>
+    <strong>@Model.EventName</strong><br />
+    Data: @Model.EventDate.ToString("dd.MM.yyyy")<br />
+    Lokalizacja: @Model.Location<br />
+    Opis: @Model.Description
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Usuń</button>
+    <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+</form>

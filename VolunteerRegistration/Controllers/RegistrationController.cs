@@ -1,25 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using VolunteerRegistration.Models;
+using VolunteerRegistration.Repositories.Interfaces;
 
 namespace VolunteerRegistration.Controllers
 {
     public class RegistrationController : Controller
     {
-        private readonly VolunteerRegistrationContext _context;
+        private readonly IRegistrationRepository _registrationRepo;
+        private readonly IRepository<Volunteer> _volunteerRepo;
 
-        public RegistrationController(VolunteerRegistrationContext context)
+        public RegistrationController(
+            IRegistrationRepository registrationRepo,
+            IRepository<Volunteer> volunteerRepo)
         {
-            _context = context;
+            _registrationRepo = registrationRepo;
+            _volunteerRepo = volunteerRepo;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var registrations = _context.Registrations
-                .Include(r => r.Volunteer)
-                .Include(r => r.Event)
-                .ToList();
-
+            var registrations = await _registrationRepo.GetAllWithDetailsAsync();
             return View(registrations);
         }
 
@@ -37,13 +37,14 @@ namespace VolunteerRegistration.Controllers
         {
             if (ModelState.IsValid)
             {
-                var existingVolunteer = await _context.Volunteers
-                    .FirstOrDefaultAsync(v => v.Email == volunteer.Email);
+                var existingVolunteer = _volunteerRepo
+                    .GetAll()
+                    .FirstOrDefault(v => v.Email == volunteer.Email);
 
                 if (existingVolunteer == null)
                 {
-                    await _context.Volunteers.AddAsync(volunteer);
-                    await _context.SaveChangesAsync();
+                    await _volunteerRepo.CreateAsync(volunteer);
+                    await _volunteerRepo.SaveAsync();
                     existingVolunteer = volunteer;
                 }
 
@@ -54,8 +55,8 @@ namespace VolunteerRegistration.Controllers
                     RegistrationDate = DateTime.Now
                 };
 
-                await _context.Registrations.AddAsync(registration);
-                await _context.SaveChangesAsync();
+                await _registrationRepo.CreateAsync(registration);
+                await _registrationRepo.SaveAsync();
 
                 return RedirectToAction("Index", "Home");
             }
@@ -64,22 +65,16 @@ namespace VolunteerRegistration.Controllers
             return View(volunteer);
         }
 
-        // GET: Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var registration = await _context.Registrations
-                .Include(r => r.Volunteer)
-                .Include(r => r.Event)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
+            var registration = await _registrationRepo.GetByIdWithDetailsAsync(id.Value);
             if (registration == null) return NotFound();
 
             return View(registration);
         }
 
-        // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Registration registration)
@@ -88,40 +83,30 @@ namespace VolunteerRegistration.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Registrations.Update(registration);
-                await _context.SaveChangesAsync();
+                await _registrationRepo.UpdateAsync(registration);
+                await _registrationRepo.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
 
             return View(registration);
         }
 
-        // GET: Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var registration = await _context.Registrations
-                .Include(r => r.Volunteer)
-                .Include(r => r.Event)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
+            var registration = await _registrationRepo.GetByIdWithDetailsAsync(id.Value);
             if (registration == null) return NotFound();
 
             return View(registration);
         }
 
-        // POST: Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var registration = await _context.Registrations.FindAsync(id);
-            if (registration != null)
-            {
-                _context.Registrations.Remove(registration);
-                await _context.SaveChangesAsync();
-            }
+            await _registrationRepo.DeleteAsync(id);
+            await _registrationRepo.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -133,14 +118,9 @@ namespace VolunteerRegistration.Controllers
         }
 
         [HttpPost]
-        public IActionResult Search(string email)
+        public async Task<IActionResult> Search(string email)
         {
-            var registrations = _context.Registrations
-                .Include(r => r.Volunteer)
-                .Include(r => r.Event)
-                .Where(r => r.Volunteer.Email == email)
-                .ToList();
-
+            var registrations = await _registrationRepo.GetByEmailWithDetailsAsync(email);
             ViewBag.SearchedEmail = email;
             return View("Search", registrations);
         }

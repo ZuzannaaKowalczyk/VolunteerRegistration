@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VolunteerRegistration.Models;
-using VolunteerRegistration.Repositories;
+using VolunteerRegistration.Repositories.Interfaces;
 
 namespace VolunteerRegistration.Controllers
 {
@@ -20,7 +20,7 @@ namespace VolunteerRegistration.Controllers
                 .GetAll()
                 .Include(e => e.EventOrganizers)
                     .ThenInclude(eo => eo.Organizer)
-                .AsQueryable(); // 👈 to gwarantuje, że możemy używać .Where()
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(city))
             {

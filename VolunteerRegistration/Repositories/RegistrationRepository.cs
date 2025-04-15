@@ -1,9 +1,10 @@
 ﻿using VolunteerRegistration.Models;
 using Microsoft.EntityFrameworkCore;
+using VolunteerRegistration.Repositories.Interfaces;
 
 namespace VolunteerRegistration.Repositories
 {
-    public class RegistrationRepository : IRepository<Registration>
+    public class RegistrationRepository : IRegistrationRepository
     {
         private readonly VolunteerRegistrationContext _context;
 
@@ -45,6 +46,33 @@ namespace VolunteerRegistration.Repositories
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        // Rozszerzone metody:
+
+        public async Task<List<Registration>> GetAllWithDetailsAsync()
+        {
+            return await _context.Registrations
+                .Include(r => r.Volunteer)
+                .Include(r => r.Event)
+                .ToListAsync();
+        }
+
+        public async Task<Registration?> GetByIdWithDetailsAsync(int id)
+        {
+            return await _context.Registrations
+                .Include(r => r.Volunteer)
+                .Include(r => r.Event)
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task<List<Registration>> GetByEmailWithDetailsAsync(string email)
+        {
+            return await _context.Registrations
+                .Include(r => r.Volunteer)
+                .Include(r => r.Event)
+                .Where(r => r.Volunteer.Email == email)
+                .ToListAsync();
         }
     }
 }

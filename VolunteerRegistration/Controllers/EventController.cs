@@ -2,21 +2,24 @@
 using Microsoft.EntityFrameworkCore;
 using VolunteerRegistration.Models;
 using VolunteerRegistration.Models.ViewModels;
+using VolunteerRegistration.Repositories.Interfaces;
 
 namespace VolunteerRegistration.Controllers
 {
     public class EventController : Controller
     {
+        private readonly IRepository<Event> _eventRepository;
         private readonly VolunteerRegistrationContext _context;
 
-        public EventController(VolunteerRegistrationContext context)
+        public EventController(IRepository<Event> eventRepository, VolunteerRegistrationContext context)
         {
+            _eventRepository = eventRepository;
             _context = context;
         }
 
         public IActionResult Index(string organizer)
         {
-            var events = _context.Events
+            var events = _eventRepository.GetAll()
                 .Include(e => e.EventOrganizers)
                     .ThenInclude(eo => eo.Organizer)
                 .AsQueryable();
@@ -33,7 +36,6 @@ namespace VolunteerRegistration.Controllers
             return View(events.ToList());
         }
 
-
         // GET: /Event/Create
         public IActionResult Create()
         {
@@ -47,9 +49,7 @@ namespace VolunteerRegistration.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Szukamy organizatora po e-mailu
-                var organizer = _context.Organizers
-                    .FirstOrDefault(o => o.Email == model.OrganizerEmail);
+                var organizer = _context.Organizers.FirstOrDefault(o => o.Email == model.OrganizerEmail);
 
                 if (organizer == null)
                 {
@@ -64,11 +64,9 @@ namespace VolunteerRegistration.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // Zapisanie wydarzenia
-                _context.Events.Add(model.Event);
-                await _context.SaveChangesAsync();
+                await _eventRepository.CreateAsync(model.Event);
+                await _eventRepository.SaveAsync();
 
-                // Powiązanie w tabeli EventOrganizer
                 var link = new EventOrganizer
                 {
                     EventId = model.Event.Id,
@@ -89,7 +87,7 @@ namespace VolunteerRegistration.Controllers
         {
             if (id == null) return NotFound();
 
-            var ev = await _context.Events.FindAsync(id.Value);
+            var ev = await _eventRepository.GetByIdAsync(id.Value);
             if (ev == null) return NotFound();
 
             return View(ev);
@@ -104,8 +102,8 @@ namespace VolunteerRegistration.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Events.Update(ev);
-                await _context.SaveChangesAsync();
+                await _eventRepository.UpdateAsync(ev);
+                await _eventRepository.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
 
@@ -117,7 +115,7 @@ namespace VolunteerRegistration.Controllers
         {
             if (id == null) return NotFound();
 
-            var ev = await _context.Events.FindAsync(id.Value);
+            var ev = await _eventRepository.GetByIdAsync(id.Value);
             if (ev == null) return NotFound();
 
             return View(ev);
@@ -128,12 +126,8 @@ namespace VolunteerRegistration.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var ev = await _context.Events.FindAsync(id);
-            if (ev != null)
-            {
-                _context.Events.Remove(ev);
-                await _context.SaveChangesAsync();
-            }
+            await _eventRepository.DeleteAsync(id);
+            await _eventRepository.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }

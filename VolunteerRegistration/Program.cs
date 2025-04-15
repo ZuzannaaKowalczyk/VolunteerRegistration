@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VolunteerRegistration.Models;
 using VolunteerRegistration.Repositories;
+using VolunteerRegistration.Repositories.Interfaces;
 
 namespace VolunteerRegistration
 {
@@ -12,22 +13,18 @@ namespace VolunteerRegistration
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Pobranie Connection String z appsettings.json
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
             // Dodanie DbContext do Dependency Injection
             builder.Services.AddDbContext<VolunteerRegistrationContext>(options =>
                 options.UseSqlServer(connectionString));
 
-
-           
-
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IRepository<Volunteer>, VolunteerRepository>();
             builder.Services.AddScoped<IRepository<Event>, EventRepository>();
-            builder.Services.AddScoped<IRepository<Organizer>, OrganizerRepository>();
             builder.Services.AddScoped<IRepository<Registration>, RegistrationRepository>();
+            builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 
             var app = builder.Build();
 

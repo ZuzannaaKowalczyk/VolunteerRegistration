@@ -1,5 +1,6 @@
 ﻿using VolunteerRegistration.Models;
 using Microsoft.EntityFrameworkCore;
+using VolunteerRegistration.Repositories.Interfaces;
 
 namespace VolunteerRegistration.Repositories
 {

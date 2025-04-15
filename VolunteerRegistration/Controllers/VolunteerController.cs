@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VolunteerRegistration.Models;
-using VolunteerRegistration.Repositories;
+using VolunteerRegistration.Repositories.Interfaces;
 
 
 namespace VolunteerRegistration.Controllers
